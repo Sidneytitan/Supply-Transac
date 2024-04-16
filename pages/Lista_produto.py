@@ -28,9 +28,9 @@ def cadastrar_produto_page():
 
     if st.button('Cadastrar Produto'):
         produto = {
-            ("**id**"): id_produto,
-            ("**nome**"): nome_produto,
-            ("**categoria**"): categoria_produto
+            "id": id_produto,
+            "nome": nome_produto,
+            "categoria": categoria_produto
         }
         cadastrar_produto_mongodb(produto)
         st.success('Produto cadastrado com sucesso!')
@@ -40,8 +40,13 @@ def visualizar_produtos_cadastrados():
 
     produtos = get_lista_produtos()
     if produtos:
+        # Adicionando o último produto cadastrado à lista de produtos na posição correta
+        ultimo_cadastro = produtos[-1]
+        produtos.pop()  # Remover o último cadastro da lista original
+        produtos.append(ultimo_cadastro)  # Adicionar o último cadastro no final da lista
+
         df = pd.DataFrame(produtos)
-        st.table(df)  # Usando st.table() para uma exibição mais bonita
+        st.dataframe(df.style.set_properties(**{'text-align': 'center'}))  # Usando st.dataframe() para uma exibição mais bonita
     else:
         st.write('Nenhum produto cadastrado ainda.')
 
@@ -56,4 +61,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+
 
