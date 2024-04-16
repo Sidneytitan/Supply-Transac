@@ -10,7 +10,7 @@ def app():  # Corrigido: adicionando a palavra-chave "def"
 
     # Coloque a imagem e o texto em uma linha
     st.image(logo_path, width=logo_size[0])
-    st.header('Supply Chain', divider='rainbow')
+    st.header('Transac Transporte Rodoviario', divider='rainbow')
 
     # Adicionando o texto sobre a importância do controle de estoque
     st.write("""
