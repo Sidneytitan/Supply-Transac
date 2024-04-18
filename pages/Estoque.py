@@ -4,14 +4,12 @@ import pandas as pd
 from datetime import datetime
 import plotly.graph_objects as go
 
-
 # Função para conectar ao banco de dados MongoDB
 def connect_to_mongodb():
     client = MongoClient("mongodb+srv://sidneycko:titanbetty@cluster0.feenv6t.mongodb.net/?retryWrites=true&w=majority")
     db = client["titan"]
     collection = db["estoque"]  # Coleção para os produtos cadastrados
     return collection
-
 
 # Função para adicionar uma nova movimentação ao estoque
 def add_movimentacao_to_estoque(movimentacao):
@@ -24,7 +22,6 @@ def add_movimentacao_to_estoque(movimentacao):
 
     collection.insert_one(movimentacao)
 
-
 # Função para recuperar os produtos cadastrados na coleção lista_produtos
 def get_lista_produtos():
     client = MongoClient("mongodb+srv://sidneycko:titanbetty@cluster0.feenv6t.mongodb.net/?retryWrites=true&w=majority")
@@ -32,7 +29,6 @@ def get_lista_produtos():
     collection = db["lista_produtos"]  # Coleção para os produtos cadastrados
     produtos = list(collection.find({}, {"_id": 0}))  # Excluir o campo _id
     return produtos
-
 
 # Função para exibir as movimentações cadastradas no estoque
 def display_movimentacoes(filtro_produto):
@@ -184,6 +180,13 @@ def display_movimentacoes(filtro_produto):
         # Atualiza o documento no MongoDB com o valor unitário
         collection.update_one({"_id": index}, {"$set": {"valor_unitario": valor_unitario}})
 
+# Função para obter o último valor de entrada para um produto específico
+def get_ultimo_valor_entrada(id_produto):
+    collection = connect_to_mongodb()
+    ultima_entrada = collection.find_one({"id_produto": id_produto, "tipo_movimentacao": "Entrada"}, sort=[("data_movimento", -1)])
+    if ultima_entrada:
+        return ultima_entrada.get("valor_unitario", 0.0)
+    return 0.0
 
 # Função para recuperar as opções de "Recebido por" do banco de dados MongoDB
 def get_quem_retirou_options():
@@ -193,11 +196,9 @@ def get_quem_retirou_options():
     options = [option["nome"] for option in collection.find({}, {"_id": 0})]
     return options
 
-
 # Função para obter os nomes dos produtos
 def get_nomes_produtos(produtos):
     return [produto.get('nome') for produto in produtos]
-
 
 def main():
     # Configuração da página
@@ -245,7 +246,12 @@ def main():
         # Adicione os campos na linha abaixo
         col5, col6, col7 = st.columns([2, 1, 1])
         with col5:
-            valor_unitario = st.number_input('**Valor Unitário (R$)**', min_value=0.0, step=0.01)
+            if tipo_movimentacao == "Entrada":
+                valor_unitario = st.number_input('**Valor Unitário (R$)**', min_value=0.0, step=0.01)
+            else:
+                # Preenche automaticamente o valor unitário com o último valor de entrada para o produto selecionado
+                ultimo_valor_entrada = get_ultimo_valor_entrada(id_produto)
+                valor_unitario = st.number_input('**Valor Unitário (R$)**', value=ultimo_valor_entrada, min_value=0.0, step=0.01)
         with col6:
             total_valor_pago = quantidade_movimentacao * valor_unitario
             st.write('**Total Valor Pago (R$)**')
@@ -303,7 +309,6 @@ def main():
         # Adiciona a barra de pesquisa para filtrar por produto na sidebar
         filtro_produto = st.sidebar.text_input("**Pesquisar Produto**", key="pesquisar_produto")
         display_movimentacoes(filtro_produto)
-
 
 if __name__ == '__main__':
     main()
