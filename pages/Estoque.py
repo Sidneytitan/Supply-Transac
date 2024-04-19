@@ -193,8 +193,10 @@ def get_quem_retirou_options():
     client = MongoClient("mongodb+srv://sidneycko:titanbetty@cluster0.feenv6t.mongodb.net/?retryWrites=true&w=majority")
     db = client["titan"]
     collection = db["Recebido por"]  # Coleção para as opções de "Recebido por"
-    options = [option["nome"] for option in collection.find({}, {"_id": 0})]
+    options = [option.get("valor", "") for option in collection.find({}, {"_id": 0})]
+
     return options
+
 
 # Função para obter os nomes dos produtos
 def get_nomes_produtos(produtos):
