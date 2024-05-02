@@ -183,10 +183,23 @@ def display_movimentacoes(filtro_produto):
 # Função para obter o último valor de entrada para um produto específico
 def get_ultimo_valor_entrada(id_produto):
     collection = connect_to_mongodb()
-    ultima_entrada = collection.find_one({"id_produto": id_produto, "tipo_movimentacao": "Entrada"}, sort=[("data_movimento", -1)])
+    # Encontrar a entrada mais recente para o produto selecionado
+    ultima_entrada = collection.find_one({"id_produto": id_produto, "tipo_movimentacao": "Entrada"},
+                                          sort=[("data_movimento", 1)])
+    # Verificar se foi encontrada uma entrada
     if ultima_entrada:
+        # Retornar o valor unitário da última entrada
         return ultima_entrada.get("valor_unitario", 0.0)
+    # Se não houver entrada encontrada, retornar 0.0
     return 0.0
+
+
+
+
+
+
+
+
 
 # Função para recuperar as opções de "Recebido por" do banco de dados MongoDB
 def get_quem_retirou_options():
