@@ -24,7 +24,7 @@ def cadastrar_produto_page():
 
     id_produto = st.number_input('**ID do Produto**', min_value=1, step=1)
     nome_produto = st.text_input('**Nome do Produto**')
-    categoria_produto = st.selectbox('**Categoria do Produto**', ['EPI', 'EPC', 'PEÇA'])
+    categoria_produto = st.selectbox('**Categoria do Produto**', ['EPI', 'EPC', 'PEÇA', 'UNIFORME'])
 
     if st.button('Cadastrar Produto'):
         produto = {
